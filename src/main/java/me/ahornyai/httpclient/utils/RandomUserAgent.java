@@ -9,11 +9,10 @@ import java.util.Map.Entry;
  */
 
 public class RandomUserAgent {
-    private static Map<String, String[]> uaMap = new HashMap<String, String[]>();
-    private static Map<String, Double> freqMap = new HashMap<String, Double>();
+    private static Map<String, String[]> uaMap = new HashMap<>();
+    private static Map<String, Double> freqMap = new HashMap<>();
 
     static {
-
         freqMap.put("Internet Explorer", 11.8);
         freqMap.put("Firefox", 28.2);
         freqMap.put("Chrome", 52.9);
@@ -1651,7 +1650,6 @@ public class RandomUserAgent {
     }
 
     public static String getRandomUserAgent() {
-
         double rand = Math.random() * 100;
         String browser = null;
         double count = 0.0;

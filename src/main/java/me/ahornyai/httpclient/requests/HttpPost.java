@@ -4,24 +4,24 @@ import me.ahornyai.httpclient.HttpClient;
 import me.ahornyai.httpclient.HttpRequest;
 
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class HttpPost extends HttpRequest {
     /*
      * CONSTRUCTORS
      */
 
-    public HttpPost(String url, HashMap<String, String> params, HashMap<String, String> headers) {
-        super(url, params, headers);
+    public HttpPost(String url, HashMap<String, String> urlParams, HashMap<String, String> bodyParams, HashMap<String, String> headers) {
+        super(url, urlParams, bodyParams, headers);
     }
 
-    public HttpPost(String url, HashMap<String, String> params) {
-        super(url, params);
+    public HttpPost(String url, HashMap<String, String> params, boolean isUrlParams) {
+        super(url, params, isUrlParams);
     }
 
     public HttpPost(String url) {
@@ -33,36 +33,36 @@ public class HttpPost extends HttpRequest {
      */
 
     @Override
-    public void run(HttpClient client, BiConsumer<String, Integer> consumer, boolean async) throws IOException {
+    public void run(HttpClient client, BiConsumer<String, Integer> consumer, Consumer<Exception> exCallback, boolean async) {
         if (async) {
-            HttpClient.executor.execute(() -> {
-                try {
-                    run(client, consumer, false);
-                } catch (IOException e) {
-                    consumer.accept(null, -1);
-                    throw new RuntimeException(e);
-                }
-            });
+            HttpClient.executor.execute(() -> run(client, consumer, exCallback,false));
         }else {
-            byte[] paramsBytes = paramBuilder(params).getBytes(StandardCharsets.UTF_8);
+            try {
+                URL urlObj = new URL(url + urlParamBuilder(urlParams));
+                HttpURLConnection uc = (HttpURLConnection) urlObj.openConnection();
+                uc.setDoOutput(true);
+                uc.setRequestMethod("POST");
+                uc.addRequestProperty("User-Agent", client.getUserAgent());
 
-            URL urlObj = new URL(url);
-            HttpURLConnection uc = (HttpURLConnection) urlObj.openConnection();
-            uc.setDoOutput(true);
-            uc.setRequestMethod("POST");
-            uc.addRequestProperty("User-Agent", client.getUserAgent());
-            uc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            uc.setRequestProperty("Content-Length", paramsBytes.length + "");
-            applyHeaders(uc);
+                if (bodyParams != null) {
+                    if (!bodyParams.isEmpty()) {
+                        byte[] paramsBytes = paramBuilder(bodyParams).getBytes(StandardCharsets.UTF_8);
 
-            try(DataOutputStream wr = new DataOutputStream(uc.getOutputStream())) {
-                wr.write(paramsBytes);
-            }
+                        uc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                        uc.setRequestProperty("Content-Length", paramsBytes.length + "");
+                        applyHeaders(uc);
 
-            if (uc.getResponseCode() > 399 && uc.getResponseCode() < 600)
-                consumer.accept(readOutput(uc.getErrorStream()), uc.getResponseCode());
-            else
-                consumer.accept(readOutput(uc.getInputStream()), uc.getResponseCode());
+                        try (DataOutputStream wr = new DataOutputStream(uc.getOutputStream())) {
+                            wr.write(paramsBytes);
+                        }
+                    }
+                }
+
+                if (uc.getResponseCode() > 399 && uc.getResponseCode() < 600)
+                    consumer.accept(readOutput(uc.getErrorStream()), uc.getResponseCode());
+                else
+                    consumer.accept(readOutput(uc.getInputStream()), uc.getResponseCode());
+            }catch (Exception ex) {exCallback.accept(ex);}
         }
     }
 }

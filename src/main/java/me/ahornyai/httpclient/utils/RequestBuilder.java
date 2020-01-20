@@ -2,8 +2,10 @@ package me.ahornyai.httpclient.utils;
 
 import me.ahornyai.httpclient.HttpMethod;
 import me.ahornyai.httpclient.HttpRequest;
+import me.ahornyai.httpclient.requests.HttpDelete;
 import me.ahornyai.httpclient.requests.HttpGet;
 import me.ahornyai.httpclient.requests.HttpPost;
+import me.ahornyai.httpclient.requests.HttpPut;
 
 import java.util.HashMap;
 
@@ -11,7 +13,8 @@ public class RequestBuilder {
     private HttpMethod method;
     private String url;
     private HashMap<String, String> headers = new HashMap<>();
-    private HashMap<String, String> params = new HashMap<>();
+    private HashMap<String, String> urlParams = new HashMap<>();
+    private HashMap<String, String> bodyParams = new HashMap<>();
 
     public RequestBuilder method(HttpMethod method) {
         this.method = method;
@@ -28,8 +31,13 @@ public class RequestBuilder {
         return this;
     }
 
-    public RequestBuilder addParam(String param, String value) {
-        params.put(param, value);
+    public RequestBuilder addBodyParam(String param, String value) {
+        bodyParams.put(param, value);
+        return this;
+    }
+
+    public RequestBuilder addUrlParam(String param, String value) {
+        urlParams.put(param, value);
         return this;
     }
 
@@ -38,15 +46,22 @@ public class RequestBuilder {
         return this;
     }
 
-    public RequestBuilder params(HashMap<String, String> params) {
-        this.params = params;
+    public RequestBuilder bodyParams(HashMap<String, String> params) {
+        this.bodyParams = params;
+        return this;
+    }
+
+    public RequestBuilder urlParams(HashMap<String, String> params) {
+        this.urlParams = params;
         return this;
     }
 
     public HttpRequest build() {
         switch (method) {
-            case POST: return new HttpPost(url, params, headers);
-            default: return new HttpGet(url, params, headers);
+            case PUT: return new HttpPut(url, urlParams, bodyParams, headers);
+            case DELETE: return new HttpDelete(url, urlParams, bodyParams, headers);
+            case POST: return new HttpPost(url, urlParams, bodyParams, headers);
+            default: return new HttpGet(url, urlParams, bodyParams, headers);
         }
     }
 

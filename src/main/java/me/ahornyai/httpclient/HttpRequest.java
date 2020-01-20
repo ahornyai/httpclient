@@ -13,30 +13,42 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 @Getter
 @Setter
 public abstract class HttpRequest {
     protected String url;
-    protected HashMap<String, String> headers;;
-    protected HashMap<String, String> params;
+    protected HashMap<String, String> headers;
+    protected HashMap<String, String> urlParams;
+    protected HashMap<String, String> bodyParams;
 
-    public HttpRequest(String url, HashMap<String, String> params, HashMap<String, String> headers) {
+    public HttpRequest(String url, HashMap<String, String> urlParams, HashMap<String, String> bodyParams, HashMap<String, String> headers) {
         this.url = url;
-        this.params = params;
+        this.urlParams = urlParams;
+        this.bodyParams = bodyParams;
         this.headers = headers;
     }
 
-    public HttpRequest(String url, HashMap<String, String> params) {
+    public HttpRequest(String url, HashMap<String, String> urlParams, HashMap<String, String> bodyParams) {
         this.url = url;
-        this.params = params;
+        this.urlParams = urlParams;
+        this.bodyParams = bodyParams;
+    }
+
+    public HttpRequest(String url, HashMap<String, String> params, boolean isUrlParams) {
+        this.url = url;
+        if (isUrlParams)
+            this.urlParams = params;
+        else
+            this.bodyParams = params;
     }
 
     public HttpRequest(String url) {
         this.url = url;
     }
 
-    abstract public void run(HttpClient client, BiConsumer<String, Integer> consumer, boolean async) throws IOException;
+    public abstract void run(HttpClient client, BiConsumer<String, Integer> consumer, Consumer<Exception> exCallback, boolean async);
 
     protected String paramBuilder(HashMap<String, String> params) {
         if (params == null) return "";
@@ -53,7 +65,7 @@ public abstract class HttpRequest {
         return paramBuilder.toString();
     }
 
-    protected String getParamBuilder(HashMap<String, String> params) {
+    protected String urlParamBuilder(HashMap<String, String> params) {
         if (params == null) return "";
         boolean isFirst = true;
         StringBuilder paramBuilder = new StringBuilder();

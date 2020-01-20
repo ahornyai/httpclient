@@ -11,24 +11,20 @@ import java.util.HashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class HttpGet extends HttpRequest {
+public class HttpPut extends HttpRequest {
     /*
      * CONSTRUCTORS
      */
 
-    public HttpGet(String url, HashMap<String, String> urlParams, HashMap<String, String> bodyParams, HashMap<String, String> headers) {
+    public HttpPut(String url, HashMap<String, String> urlParams, HashMap<String, String> bodyParams, HashMap<String, String> headers) {
         super(url, urlParams, bodyParams, headers);
     }
 
-    public HttpGet(String url, HashMap<String, String> urlParams, HashMap<String, String> bodyParams) {
-        super(url, urlParams, bodyParams);
-    }
-
-    public HttpGet(String url, HashMap<String, String> params, boolean isUrlParams) {
+    public HttpPut(String url, HashMap<String, String> params, boolean isUrlParams) {
         super(url, params, isUrlParams);
     }
 
-    public HttpGet(String url) {
+    public HttpPut(String url) {
         super(url);
     }
 
@@ -44,16 +40,17 @@ public class HttpGet extends HttpRequest {
             try {
                 URL urlObj = new URL(url + urlParamBuilder(urlParams));
                 HttpURLConnection uc = (HttpURLConnection) urlObj.openConnection();
+                uc.setDoOutput(true);
+                uc.setRequestMethod("PUT");
                 uc.addRequestProperty("User-Agent", client.getUserAgent());
-                applyHeaders(uc);
 
                 if (bodyParams != null) {
                     if (!bodyParams.isEmpty()) {
                         byte[] paramsBytes = paramBuilder(bodyParams).getBytes(StandardCharsets.UTF_8);
 
-                        uc.setDoOutput(true);
                         uc.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                         uc.setRequestProperty("Content-Length", paramsBytes.length + "");
+                        applyHeaders(uc);
 
                         try (DataOutputStream wr = new DataOutputStream(uc.getOutputStream())) {
                             wr.write(paramsBytes);
@@ -61,14 +58,11 @@ public class HttpGet extends HttpRequest {
                     }
                 }
 
-
                 if (uc.getResponseCode() > 399 && uc.getResponseCode() < 600)
                     consumer.accept(readOutput(uc.getErrorStream()), uc.getResponseCode());
                 else
                     consumer.accept(readOutput(uc.getInputStream()), uc.getResponseCode());
-
-                uc.disconnect();
-            } catch (Exception ex) {exCallback.accept(ex);}
+            }catch (Exception ex) {exCallback.accept(ex);}
         }
     }
 }
