@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 @Setter
 public abstract class HttpRequest {
     protected String url;
+    protected String body;
     protected HashMap<String, String> headers;
     protected HashMap<String, String> urlParams;
     protected HashMap<String, String> bodyParams;

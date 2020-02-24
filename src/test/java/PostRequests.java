@@ -34,7 +34,7 @@ public class PostRequests extends RequestTest {
                 .method(HttpMethod.POST)
                 .url("https://postman-echo.com/post")
                 .addUrlParam("param1", "1")
-                .addBodyParam("param2", "2")
+                .body("xddd hahayes")
                 .addHeader("header1", "1")
                 .addHeader("header2", "2")
                 .build();

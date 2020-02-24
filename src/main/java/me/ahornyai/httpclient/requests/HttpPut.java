@@ -55,6 +55,15 @@ public class HttpPut extends HttpRequest {
                         try (DataOutputStream wr = new DataOutputStream(uc.getOutputStream())) {
                             wr.write(paramsBytes);
                         }
+                    }else {
+                        byte[] paramsBytes = body.getBytes(StandardCharsets.UTF_8);
+
+                        uc.setRequestProperty("Content-Length", paramsBytes.length + "");
+                        applyHeaders(uc);
+
+                        try (DataOutputStream wr = new DataOutputStream(uc.getOutputStream())) {
+                            wr.write(paramsBytes);
+                        }
                     }
                 }
 

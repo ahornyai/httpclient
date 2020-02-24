@@ -48,10 +48,6 @@ public class Others extends RequestTest {
                         System.out.println("SUCCESS ERROR HANDLING"), false);
     }
 
-    /*
-     * HTTPCLIENT
-     */
-
     @Test
     public void customUserAgent() {
         runTest("custom user agent");

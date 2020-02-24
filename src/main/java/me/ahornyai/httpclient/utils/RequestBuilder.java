@@ -15,6 +15,7 @@ public class RequestBuilder {
     private HashMap<String, String> headers = new HashMap<>();
     private HashMap<String, String> urlParams = new HashMap<>();
     private HashMap<String, String> bodyParams = new HashMap<>();
+    private String body;
 
     public RequestBuilder method(HttpMethod method) {
         this.method = method;
@@ -46,6 +47,11 @@ public class RequestBuilder {
         return this;
     }
 
+    public RequestBuilder body(String body) {
+        this.body = body;
+        return this;
+    }
+
     public RequestBuilder bodyParams(HashMap<String, String> params) {
         this.bodyParams = params;
         return this;
@@ -58,10 +64,26 @@ public class RequestBuilder {
 
     public HttpRequest build() {
         switch (method) {
-            case PUT: return new HttpPut(url, urlParams, bodyParams, headers);
-            case DELETE: return new HttpDelete(url, urlParams, bodyParams, headers);
-            case POST: return new HttpPost(url, urlParams, bodyParams, headers);
-            default: return new HttpGet(url, urlParams, bodyParams, headers);
+            case PUT: {
+                HttpPut res = new HttpPut(url, urlParams, bodyParams, headers);
+                res.setBody(body);
+                return res;
+            }
+            case DELETE: {
+                HttpDelete res = new HttpDelete(url, urlParams, bodyParams, headers);
+                res.setBody(body);
+                return res;
+            }
+            case POST: {
+                HttpPost res = new HttpPost(url, urlParams, bodyParams, headers);
+                res.setBody(body);
+                return res;
+            }
+            default: {
+                HttpGet res = new HttpGet(url, urlParams, bodyParams, headers);
+                res.setBody(body);
+                return res;
+            }
         }
     }
 
