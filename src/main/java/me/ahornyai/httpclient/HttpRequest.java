@@ -2,6 +2,7 @@ package me.ahornyai.httpclient;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,7 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -99,7 +99,8 @@ public abstract class HttpRequest {
         }
     }
 
+    @SneakyThrows
     private String encode(String str) {
-        return URLEncoder.encode(str, StandardCharsets.UTF_8);
+        return URLEncoder.encode(str, "UTF-8");
     }
 }

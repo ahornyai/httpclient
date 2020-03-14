@@ -58,9 +58,10 @@ public class HttpGet extends HttpRequest {
                         try (DataOutputStream wr = new DataOutputStream(uc.getOutputStream())) {
                             wr.write(paramsBytes);
                         }
-                    }else {
+                    }else if(body != null) {
                         byte[] paramsBytes = body.getBytes(StandardCharsets.UTF_8);
 
+                        uc.setDoOutput(true);
                         uc.setRequestProperty("Content-Length", paramsBytes.length + "");
                         applyHeaders(uc);
 
