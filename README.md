@@ -11,69 +11,72 @@ GET, POST, PUT, DELETE
 
 # USAGE
 **Simple GET request**
-	
+```java
 	import me.ahornyai.httpclient.HttpClient;  
 	import me.ahornyai.httpclient.requests.HttpGet;
 	import java.util.HashMap;
 
-    public void get() {
-      HttpClient client = new HttpClient(/*custom user agent (default is random)*/);
-      HashMap<String, String> params = new HashMap<>();
-      params.put("param1", "1");
-      params.put("param2", "2");
-      HashMap<String, String> headers = new HashMap<>();
-      headers.put("header1", "1");
-      headers.put("header2", "2");
+    	public void get() {
+      		HttpClient client = new HttpClient(); //default user agent is random
+      		HashMap<String, String> params = new HashMap<>();
+      		params.put("param1", "1");
+      		params.put("param2", "2");
+		
+		HashMap<String, String> headers = new HashMap<>();
+      		headers.put("header1", "1");
+      		headers.put("header2", "2");
       
-      HttpGet get = new HttpGet(/*url*/"https://postman-echo.com/get", /*url params*/params, /*body params*/null, /*headers*/headers);  
-      get.run(client, (response, status) -> System.out.println("response: " + response + " \nstatus: " + status), (e) -> {
-      //error callback
-      }, /*async*/ false);  
-    }
-
+      		HttpGet get = new HttpGet("https://postman-echo.com/get", params, null, headers);  //url, params, body params, headers
+		
+      		get.run(client, (response, status) -> System.out.println("response: " + response + " \nstatus: " + status), (e) -> {
+      			//error callback
+		}, false); //async boolean
+    	}
+```
 **GET request with builder**
-
+```java
 	import me.ahornyai.httpclient.HttpClient;  
 	import me.ahornyai.httpclient.HttpRequest;
 	import me.ahornyai.httpclient.utils.RequestBuilder;
 	
-    public void getWithBuilder() {
-      HttpClient client = new HttpClient();  
-      HttpRequest request = new RequestBuilder()  
-     .method(HttpMethod.GET)  
-     .url("https://postman-echo.com/get")  
-     .addUrlParam("param1", "1")  
-     .addUrlParam("param2", "2")  
-     .addHeader("header1", "1")  
-     .addHeader("header2", "2")  
-     .build();  
-      
-      request.run(client, (response, status) -> System.out.println("response: " + response + " \nstatus: " + status), (e) -> {
-	      //error callback
-      }, false);  
-    }
+    	public void getWithBuilder() {
+	      HttpClient client = new HttpClient();  
+	      HttpRequest request = new RequestBuilder()  
+		     .method(HttpMethod.GET)  
+		     .url("https://postman-echo.com/get")  
+		     .addUrlParam("param1", "1")  
+		     .addUrlParam("param2", "2")  
+		     .addHeader("header1", "1")  
+		     .addHeader("header2", "2")  
+		     .build();  
 
+	      request.run(client, (response, status) -> System.out.println("response: " + response + " \nstatus: " + status), (e) -> {
+		      //error callback
+	      }, false); //async
+    	}
+```
 **Asynchronized GET request**
+```java
+    	public void asyncGet() {
+	      HttpClient client = new HttpClient();  
+	      HttpRequest request = new RequestBuilder()  
+		     .method(HttpMethod.GET)  
+		     .url("https://postman-echo.com/get")  
+		     .addUrlParam("param1", "1")  
+		     .addUrlParam("param2", "2")  
+		     .addHeader("header1", "1")  
+		     .addHeader("header2", "2")  
+		     .build();  
 
-    public void asyncGet() {
-      HttpClient client = new HttpClient();  
-      HttpRequest request = new RequestBuilder()  
-     .method(HttpMethod.GET)  
-     .url("https://postman-echo.com/get")  
-     .addUrlParam("param1", "1")  
-     .addUrlParam("param2", "2")  
-     .addHeader("header1", "1")  
-     .addHeader("header2", "2")  
-     .build();  
-      
-      request.run(client, (response, status) -> {
-      System.out.println("response: " + response + " \nstatus: " + status);
-     }, (e) -> {
-      e.printStackTrace();  
-     }, /*async*/ true);  
-      System.out.println("Waiting for complete async request..."); 
-    }
-
+	     request.run(client, (response, status) -> {
+	      	System.out.println("response: " + response + " \nstatus: " + status);
+	     }, (e) -> {
+	     	//error handling
+	     }, true); //async
+	     
+	     System.out.println("Waiting for complete async request..."); 
+      }
+```
 **All other examples (custom user agent, more methods, error handling, etc... in: [test folder](https://github.com/ahornyai/httpclient/tree/master/src/test/java))**
 
 # LICENSE
